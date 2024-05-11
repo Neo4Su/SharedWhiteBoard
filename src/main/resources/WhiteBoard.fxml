@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21" fx:controller="client.WhiteBoardController">
+    <MenuBar>
+        <Menu text="File">
+            <MenuItem onAction="#handleNew" text="New" />
+            <MenuItem onAction="#handleOpen" text="Open" />
+            <MenuItem onAction="#handleSave" text="Save" />
+            <MenuItem onAction="#handleSaveAs" text="Save As" />
+            <SeparatorMenuItem />
+            <MenuItem onAction="#handleClose" text="Close" />
+        </Menu>
+        <Menu text="Client Manage">
+            <MenuItem onAction="#handleKickOut" text="Kick Out" />
+        </Menu>
+    </MenuBar>
+   <ToolBar>
+      <items>
+         <Button fx:id="textButton" onAction="#textButtonClicked" text="Text" />
+         <Button fx:id="pencilButton" onAction="#PencilButtonClicked" text="Pencil" />
+         <Button fx:id="lineButton" onAction="#LineButtonClicked" text="Line" />
+         <Button fx:id="rectButton" onAction="#RectButtonClicked" text="Rectangle" />
+         <Button fx:id="ovalButton" onAction="#OvalButtonClicked" text="Oval" />
+         <Button fx:id="circleButton" onAction="#CircleButtonClicked" text="Circle" />
+         <Label text="Color:" />
+         <ColorPicker fx:id="colorPicker" onAction="#colorPicked" />
+         <Button fx:id="eraserButton" onAction="#eraserButtonClicked" text="Eraser" />
+         <Label text="Size:" />
+         <ChoiceBox fx:id="sizeChoiceBox" prefHeight="23.0" prefWidth="92.0" />
+      </items>
+   </ToolBar>
+   <SplitPane dividerPositions="0.7226645435244162" prefHeight="514.0" prefWidth="839.0">
+     <items>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <children>
+               <Canvas fx:id="canvas" height="512.0" layoutX="87.0" layoutY="32.0" onMouseDragged="#canvasMouseDragged" onMousePressed="#canvasMousePressed" onMouseReleased="#canvasMouseReleased" width="604.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+               <TextField fx:id="canvasTextInput" layoutX="212.0" layoutY="126.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" visible="false" />
+            </children>
+         </AnchorPane>
+       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="514.0" prefWidth="188.0">
+            <children>
+               <ListView layoutX="9.0" layoutY="38.0" prefHeight="180.0" prefWidth="164.0" />
+               <Label layoutX="14.0" layoutY="14.0" text="Users">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </Label>
+               <TextArea layoutX="17.0" layoutY="247.0" prefHeight="168.0" prefWidth="195.0" />
+               <Label layoutX="9.0" layoutY="228.0" text="Chat">
+                  <font>
+                     <Font size="14.0" />
+                  </font>
+               </Label>
+               <TextField layoutX="25.0" layoutY="434.0" />
+               <Button layoutX="83.0" layoutY="465.0" mnemonicParsing="false" text="Send" />
+            </children>
+         </AnchorPane>
+     </items>
+   </SplitPane>
+
+</VBox>

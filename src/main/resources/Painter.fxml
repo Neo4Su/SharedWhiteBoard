@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="530.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.WhiteBoardController">
+    <left>
+        <VBox maxHeight="1.7976931348623157E308" prefHeight="464.0" prefWidth="106.0" spacing="8.0" BorderPane.alignment="CENTER">
+            <children>
+                <TitledPane text="粗细">
+                    <content>
+                        <VBox spacing="8.0">
+                            <children>
+                                <RadioButton fx:id="smallRadioButton" mnemonicParsing="false" onAction="#sizeRadioButtonSelected" text="细">
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="sizeToggleGroup" />
+                                    </toggleGroup>
+                                </RadioButton>
+                                <RadioButton fx:id="mediumRadioButton" mnemonicParsing="false" onAction="#sizeRadioButtonSelected" selected="true" text="中等" toggleGroup="$sizeToggleGroup" />
+                                <RadioButton fx:id="largeRadioButton" mnemonicParsing="false" onAction="#sizeRadioButtonSelected" text="粗" toggleGroup="$sizeToggleGroup" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <TitledPane text="形状">
+                    <content>
+                        <VBox spacing="8.0">
+                            <children>
+                                <RadioButton fx:id="lineRadioButton" mnemonicParsing="false" onAction="#shapeRadioButtonSelected" selected="true" text="直线">
+                                    <toggleGroup>
+                                        <ToggleGroup fx:id="shapeToggleGroup" />
+                                    </toggleGroup></RadioButton>
+                                <RadioButton fx:id="rectRadioButton" mnemonicParsing="false" onAction="#shapeRadioButtonSelected" text="矩形" toggleGroup="$shapeToggleGroup" />
+                                <RadioButton fx:id="circleRadioButton" mnemonicParsing="false" onAction="#shapeRadioButtonSelected" text="圆形" toggleGroup="$shapeToggleGroup" />
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <TitledPane text="颜色">
+                    <content>
+                        <VBox spacing="8.0">
+                            <children>
+                                <GridPane alignment="CENTER_LEFT" prefHeight="90.0" prefWidth="84.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="37.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="171.0" minWidth="10.0" prefWidth="43.0" />
+                                    </columnConstraints>
+                                    <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    </rowConstraints>
+                                    <children>
+                                        <Label alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="24.0" prefWidth="40.0" text="红：">
+                                            <font>
+                                                <Font size="18.0" />
+                                            </font>
+                                        </Label>
+                                        <Label alignment="CENTER_RIGHT" prefHeight="20.0" prefWidth="64.0" text="绿：" GridPane.rowIndex="1">
+                                            <font>
+                                                <Font size="18.0" />
+                                            </font>
+                                        </Label>
+                                        <Label alignment="CENTER_RIGHT" prefHeight="24.0" prefWidth="52.0" text="蓝：" GridPane.rowIndex="2">
+                                            <font>
+                                                <Font size="18.0" />
+                                            </font>
+                                        </Label>
+                                        <TextField fx:id="redTextField" alignment="CENTER" text="0" GridPane.columnIndex="1" />
+                                        <TextField fx:id="greenTextField" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <TextField fx:id="blueTextField" alignment="CENTER" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    </children>
+                                </GridPane>
+                            </children>
+                        </VBox>
+                    </content>
+                </TitledPane>
+                <Button fx:id="undoButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#undoButtonPressed" text="上一步" />
+                <Button fx:id="clearButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#clearButtonPressed" text="清空" />
+            </children>
+            <BorderPane.margin>
+                <Insets right="8.0" />
+            </BorderPane.margin>
+        </VBox>
+    </left>
+    <center>
+        <Pane fx:id="drawingAreaPane" onMousePressed="#drawingAreaMousePressed" onMouseReleased="#drawingAreaMouseReleased" prefHeight="513.0" prefWidth="520.0" style="-fx-background-color: white;" BorderPane.alignment="CENTER" />
+    </center>
+    <padding>
+        <Insets bottom="8.0" left="8.0" right="8.0" top="8.0" />
+    </padding>
+</BorderPane>
