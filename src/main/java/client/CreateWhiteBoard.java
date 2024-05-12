@@ -5,6 +5,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import remote.ClientService;
 import remote.WhiteBoardService;
@@ -13,6 +14,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Locale;
 
 public class CreateWhiteBoard extends Application {
     private static String username;
@@ -24,24 +26,38 @@ public class CreateWhiteBoard extends Application {
     // set gui of the whiteboard
     @Override
     public void start(Stage stage) throws Exception {
-
-
-
+        Locale.setDefault(Locale.US);
         FXMLLoader fxmlLoader = new FXMLLoader(CreateWhiteBoard.class.getResource("/Whiteboard.fxml"));
         Parent root = fxmlLoader.load();
 
-        // pass the whiteboard service to the controller
-        WhiteBoardController whiteBoardController = fxmlLoader.getController();
-        whiteBoardController.setWhiteBoardService(whiteBoardService);
 
-        // register the user
+        WhiteBoardController whiteBoardController = fxmlLoader.getController();
+
+        // initialize the whiteboard controller
+        whiteBoardController.setWhiteBoardService(whiteBoardService);
+        whiteBoardController.initializeIdentity("Manager");
+        whiteBoardController.setCurrentUser(username);
+        whiteBoardController.initializeUserList();
+        whiteBoardController.initializeChat();
+
+        // register the manager
         clientService = new ClientServiceImpl(whiteBoardController);
-        whiteBoardService.registerUser(username, clientService);
+        if (!whiteBoardService.registerUser(username, clientService, true)){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("The whiteboard already has a manager.");
+            alert.setOnCloseRequest(event -> System.exit(0));
+            alert.showAndWait();
+
+        }
 
         // show the whiteboard gui
         Scene scene = new Scene(root);
-        stage.setTitle("WhiteBoard"); // displayed in window's title bar
+        stage.setTitle("WhiteBoard (Manager)"); // displayed in window's title bar
         stage.setScene(scene);
+
+        whiteBoardController.setupCloseHandler(stage);
         stage.show();
     }
 
@@ -52,8 +68,6 @@ public class CreateWhiteBoard extends Application {
         port = Integer.parseInt(args[2]);
 
         connectServer();
-
-
 
         launch(args);
     }
@@ -69,4 +83,5 @@ public class CreateWhiteBoard extends Application {
             e.printStackTrace();
         }
     }
+
 }

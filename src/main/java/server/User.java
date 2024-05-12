@@ -14,6 +14,7 @@ public class User {
         this.clientService = clientService;
     }
 
+
     public String getUsername(){
         return username;
     }
