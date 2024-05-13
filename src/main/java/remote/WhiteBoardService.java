@@ -15,6 +15,8 @@ public interface WhiteBoardService extends Remote {
 
     void drawOnCanvas(byte[] snapshotBytes) throws RemoteException;
 
+    byte[] getCanvas() throws RemoteException;
+
     ArrayList<String> getUserList() throws RemoteException;
 
 
@@ -28,6 +30,6 @@ public interface WhiteBoardService extends Remote {
 
     void kickUser(String username) throws RemoteException;
 
-
+    boolean hasManager() throws RemoteException;
 
 }

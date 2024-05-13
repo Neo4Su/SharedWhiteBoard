@@ -12,6 +12,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import remote.WhiteBoardService;
@@ -25,16 +26,16 @@ import java.util.ArrayList;
 
 import static java.lang.System.exit;
 
-//TODO: 1.eraser 2.text
+//TODO: 1.text font
 //
 public class WhiteBoardController {
 
     private String userType;
     private String currentUsername;
     private WhiteBoardService whiteBoardService;
-    private double SMALL = 2;
-    private double MEDIUM = 4;
-    private double LARGE = 6;
+    private double SMALL = 5;
+    private double MEDIUM = 8;
+    private double LARGE = 12;
 
     private double size=SMALL;
     // tools for drawing on the canvas
@@ -45,7 +46,7 @@ public class WhiteBoardController {
 
 
     @FXML
-    private ChoiceBox<String> sizeChoiceBox;
+    private ComboBox<String> sizeChoiceBox;
 
     @FXML
     private TextArea chatTextArea;
@@ -56,11 +57,8 @@ public class WhiteBoardController {
     @FXML
     private Button sendButton;
 
-
-
     @FXML
     private Button pencilButton;
-
 
     ObservableList<String> userList = FXCollections.observableArrayList();
     @FXML
@@ -78,6 +76,7 @@ public class WhiteBoardController {
 
     private WritableImage snapshot;
 
+    boolean shutThroughGUI = false;
 
     @FXML
     private ColorPicker colorPicker;
@@ -105,15 +104,23 @@ public class WhiteBoardController {
 
 
         // 初始化 ChoiceBox 项
-        ObservableList<String> options = FXCollections.observableArrayList(
-                "Option 1", "Option 2", "Option 3", "Option 4"  // 示例选项
-        );
-        sizeChoiceBox.setItems(options);
+        sizeChoiceBox.getItems().addAll("Small", "Medium", "Large");
+        sizeChoiceBox.setValue("Small");
 
-        // 设置默认选项
-        sizeChoiceBox.setValue("Option 1");
+        // quit properly when the window is not closed by the GUI
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (!shutThroughGUI) {
+                try {
+                    whiteBoardService.userQuit(currentUsername, userType.equals("Manager"));
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        }));
 
     }
+
+
 
     public void initializeUserList() throws RemoteException {
 
@@ -144,17 +151,17 @@ public class WhiteBoardController {
 
 
 
-
-
     @FXML
     private void canvasMousePressed(MouseEvent event) {
         startX = event.getX();
         startY = event.getY();
 
-
-        gc.beginPath();
-        gc.moveTo(startX, startY);
-
+        if (currentTool == ToolType.ERASER) {
+            gc.clearRect(startX - eraserSize / 2, startY - eraserSize / 2, eraserSize, eraserSize);
+        }else {
+            gc.beginPath();
+            gc.moveTo(startX, startY);
+        }
     }
 
     @FXML
@@ -164,6 +171,11 @@ public class WhiteBoardController {
 
         double shapeX = Math.min(startX, endX), shapeY = Math.min(startY, endY);
         double shapeWidth = Math.abs(endX - startX), shapeHeight = Math.abs(endY - startY);
+
+        if (currentTool == ToolType.ERASER) {
+            gc.clearRect(endX - eraserSize / 2, endY - eraserSize / 2, eraserSize, eraserSize);
+            return;
+        }
 
         // clear the canvas and redraw the snapshot
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -188,21 +200,43 @@ public class WhiteBoardController {
                 double radius = Math.max(shapeWidth, shapeHeight) / 2;
                 gc.strokeOval(shapeX, shapeY, 2 * radius, 2 * radius);
                 break;
-//            case ERASER:
-//                gc.clearRect(event.getX() - eraserSize / 2,
-//                        event.getY() - eraserSize / 2, eraserSize, eraserSize);
-//                break;
         }
     }
 
     @FXML
     private void canvasMouseReleased(MouseEvent event) throws RemoteException {
+        if (currentTool == ToolType.TEXT) {
+            canvasTextInput.setLayoutX(event.getX());
+            canvasTextInput.setLayoutY(event.getY());
+            canvasTextInput.setDisable(false);
+            canvasTextInput.setText(null);
+            canvasTextInput.setVisible(true);
+            canvasTextInput.requestFocus();
+        }
+
 
         snapshot = canvas.snapshot(null, null);
         whiteBoardService.drawOnCanvas(ImageBytesConverter.ImageToBytes(snapshot));
     }
 
+    @FXML
+    private void handleCanvasTextCommit(ActionEvent event) throws RemoteException {
 
+        String newText = canvasTextInput.getText();
+        if (! (newText == null || newText.trim().isEmpty())) {
+            newText = newText.trim();
+            // 设置字体
+            //gc.setFont(Font.font("Arial", 24));
+            gc.setFill(color);
+            gc.fillText(newText, canvasTextInput.getLayoutX(), canvasTextInput.getLayoutY());
+            snapshot = canvas.snapshot(null, null);
+            whiteBoardService.drawOnCanvas(ImageBytesConverter.ImageToBytes(snapshot));
+        }
+
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
+
+    }
 
 
     // set the color of shapes
@@ -216,26 +250,42 @@ public class WhiteBoardController {
     @FXML
     private void PencilButtonClicked(ActionEvent event) {
         currentTool = ToolType.PENCIL;
+
+        // hide the text input box on the canvas
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
     }
 
     @FXML
     private void CircleButtonClicked(ActionEvent event) {
         currentTool = ToolType.CIRCLE;
+
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
     }
 
     @FXML
     private void LineButtonClicked(ActionEvent event) {
         currentTool = ToolType.LINE;
+
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
     }
 
     @FXML
     private void OvalButtonClicked(ActionEvent event) {
         currentTool = ToolType.OVAL;
+
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
     }
 
     @FXML
     private void RectButtonClicked(ActionEvent event) {
         currentTool = ToolType.RECT;
+
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
     }
 
     @FXML
@@ -246,8 +296,20 @@ public class WhiteBoardController {
     @FXML
     private void eraserButtonClicked(ActionEvent event) {
         currentTool = ToolType.ERASER;
-    }
 
+        canvasTextInput.setVisible(false);
+        canvasTextInput.setDisable(true);
+    }
+    
+    @FXML
+    private void eraserSizePicked(ActionEvent event) {
+        String size = sizeChoiceBox.getValue();
+        switch (size) {
+            case "Small" -> eraserSize = SMALL;
+            case "Medium" -> eraserSize = MEDIUM;
+            case "Large" -> eraserSize = LARGE;
+        }
+    }
 
 
     @FXML
@@ -286,9 +348,7 @@ public class WhiteBoardController {
                 new FileChooser.ExtensionFilter("PNG", "*.png")
         );
 
-
         File file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
-
 
         if (file != null) {
             try {
@@ -365,6 +425,7 @@ public class WhiteBoardController {
     private void handleClose(ActionEvent event) throws RemoteException {
         Stage stage = (Stage) canvas.getScene().getWindow();
         whiteBoardService.userQuit(currentUsername, userType.equals("Manager"));
+        shutThroughGUI = true;
         stage.close();
         System.exit(0);
     }
@@ -375,7 +436,7 @@ public class WhiteBoardController {
         String selectedUser = userListView.getSelectionModel().getSelectedItem();
         if (selectedUser == null || selectedUser.equals(currentUsername)  ) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION,
-                    "Select a client to kick", ButtonType.OK);
+                    "Please select a client to kick.", ButtonType.OK);
             alert.setTitle("Message");
             alert.setHeaderText(null);
             alert.initOwner(canvas.getScene().getWindow());
@@ -493,7 +554,7 @@ public class WhiteBoardController {
 
     }
 
-    public void notifyJoinApproval(boolean isApproved) {
+    public void notifyJoinApproval(boolean isApproved) throws RemoteException {
         if (isApproved) {
             displayMainStage();
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -512,7 +573,15 @@ public class WhiteBoardController {
     }
 
 
-    public void displayMainStage() {
+    public void displayMainStage() throws RemoteException {
+        byte[] snapshotBytes = whiteBoardService.getCanvas();
+
+
+        if (snapshotBytes != null){
+            snapshot = ImageBytesConverter.BytesToImage(snapshotBytes);
+            gc.drawImage(snapshot, 0, 0, canvas.getWidth(), canvas.getHeight());
+        }
+
         stage.setTitle("WhiteBoard (Client)"); // displayed in window's title bar
         stage.setScene(scene);
         stage.show();
@@ -525,4 +594,6 @@ public class WhiteBoardController {
     public void setScene(Scene scene) {
         this.scene = scene;
     }
+
+
 }

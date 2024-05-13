@@ -16,6 +16,8 @@ public class WhiteBoardServiceImpl extends UnicastRemoteObject implements WhiteB
 
     List<String> messageList;
 
+    byte[] canvas;
+
     boolean hasManager = false;
 
     public WhiteBoardServiceImpl() throws RemoteException {
@@ -48,10 +50,10 @@ public class WhiteBoardServiceImpl extends UnicastRemoteObject implements WhiteB
         }
 
         User newUser = new User(username, clientService);
-        clientWaitList.add(newUser);
 
         // if new user is client, ask manager for approval
         if(!isManager){
+            clientWaitList.add(newUser);
             userList.get(0).getClientService().askJoin(username);
             return true;
         }
@@ -91,9 +93,15 @@ public class WhiteBoardServiceImpl extends UnicastRemoteObject implements WhiteB
 
     @Override
     public void drawOnCanvas(byte[] snapshotBytes) throws RemoteException {
+        canvas = snapshotBytes;
         for (User user : userList) {
             user.getClientService().synchronizeCanvas(snapshotBytes);
         }
+    }
+
+    @Override
+    public byte[] getCanvas() throws RemoteException {
+        return canvas;
     }
 
     @Override
@@ -113,9 +121,9 @@ public class WhiteBoardServiceImpl extends UnicastRemoteObject implements WhiteB
                 user.getClientService().notifyBoardClosed();
             }
             userList.clear();
+            hasManager = false;
             return;
         }
-
 
         for (User user : userList) {
             user.getClientService().removeUser(username);
@@ -156,6 +164,11 @@ public class WhiteBoardServiceImpl extends UnicastRemoteObject implements WhiteB
             }
         }
 
+    }
+
+    @Override
+    public boolean hasManager() throws RemoteException {
+        return hasManager;
     }
 
 

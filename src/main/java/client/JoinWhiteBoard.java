@@ -11,10 +11,12 @@ import javafx.stage.Stage;
 import remote.ClientService;
 import remote.WhiteBoardService;
 
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.util.Locale;
 
 public class JoinWhiteBoard extends Application {
     private static String username;
@@ -25,9 +27,8 @@ public class JoinWhiteBoard extends Application {
 
     // set gui of the whiteboard
     @Override
-    public void start(Stage stage) throws Exception {
-
-
+    public void start(Stage stage) throws IOException {
+        Locale.setDefault(Locale.US);
 
         FXMLLoader fxmlLoader = new FXMLLoader(CreateWhiteBoard.class.getResource("/Whiteboard.fxml"));
         Parent root = fxmlLoader.load();
@@ -40,12 +41,20 @@ public class JoinWhiteBoard extends Application {
         whiteBoardController.setCurrentUser(username);
         whiteBoardController.initializeUserList();
         whiteBoardController.initializeChat();
-
+        whiteBoardController.setupCloseHandler(stage);
         whiteBoardController.setStage(stage);
         whiteBoardController.setScene(scene);
-        whiteBoardController.setupCloseHandler(stage);
-
         Platform.setImplicitExit(false);
+
+
+        if (!whiteBoardService.hasManager()){
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText("The whiteboard hasn't been created.");
+            alert.setOnCloseRequest(event -> System.exit(0));
+            alert.showAndWait();
+        }
 
         // register the client
         clientService = new ClientServiceImpl(whiteBoardController);
@@ -74,9 +83,16 @@ public class JoinWhiteBoard extends Application {
 
     public static void main(String[] args) throws RemoteException {
         // connect to the server to get whiteboard service
-        username = args[0];
-        hostname = args[1];
-        port = Integer.parseInt(args[2]);
+        try {
+            username = args[0];
+            hostname = args[1];
+            port = Integer.parseInt(args[2]);
+        }catch (Exception e){
+            System.err.println("Invalid parameters. " +
+                    "Usage: java -jar JoinWhiteBoard.jar <username> <hostname> <port>");
+            System.exit(0);
+        }
+
 
         connectServer();
 
@@ -93,7 +109,8 @@ public class JoinWhiteBoard extends Application {
             whiteBoardService = (WhiteBoardService) registry.lookup("whiteBoardService");
             System.out.println("Connected to server");
         } catch (RemoteException | NotBoundException e) {
-            e.printStackTrace();
+            System.err.println("Error: Cannot connect to whiteboard server.");
+            System.exit(0);
         }
     }
 }

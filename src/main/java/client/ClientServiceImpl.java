@@ -82,12 +82,13 @@ public class ClientServiceImpl extends UnicastRemoteObject implements ClientServ
 
     @Override
     public void notifyJoinApproval(boolean isApproved) throws RemoteException {
-        System.out.println("platform run later");
         Platform.runLater(() -> {
-            System.out.println("Join approved: " + isApproved);
-            whiteBoardController.notifyJoinApproval(isApproved);
+            try {
+                whiteBoardController.notifyJoinApproval(isApproved);
+            } catch (RemoteException e) {
+                throw new RuntimeException(e);
+            }
         });
-        System.out.println("platform run later 2");
     }
 
 

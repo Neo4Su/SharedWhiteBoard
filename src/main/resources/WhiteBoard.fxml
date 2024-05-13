@@ -2,13 +2,14 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
@@ -34,17 +35,18 @@
     </MenuBar>
    <ToolBar>
       <items>
-         <Button fx:id="textButton" onAction="#textButtonClicked" text="Text" />
          <Button fx:id="pencilButton" onAction="#PencilButtonClicked" text="Pencil" />
          <Button fx:id="lineButton" onAction="#LineButtonClicked" text="Line" />
          <Button fx:id="rectButton" onAction="#RectButtonClicked" text="Rectangle" />
          <Button fx:id="ovalButton" onAction="#OvalButtonClicked" text="Oval" />
          <Button fx:id="circleButton" onAction="#CircleButtonClicked" text="Circle" />
+         <Button fx:id="textButton" onAction="#textButtonClicked" text="Text" />
          <Label text="Color:" />
          <ColorPicker fx:id="colorPicker" onAction="#colorPicked" />
+         <Separator orientation="VERTICAL" prefHeight="17.0" prefWidth="5.0" />
          <Button fx:id="eraserButton" onAction="#eraserButtonClicked" text="Eraser" />
          <Label text="Size:" />
-         <ChoiceBox fx:id="sizeChoiceBox" prefHeight="23.0" prefWidth="92.0" />
+         <ComboBox fx:id="sizeChoiceBox" onAction="#eraserSizePicked" prefHeight="23.0" prefWidth="90.0" />
       </items>
    </ToolBar>
    <SplitPane dividerPositions="0.7226645435244162" prefHeight="514.0" prefWidth="839.0">
@@ -52,13 +54,13 @@
        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
             <children>
                <Canvas fx:id="canvas" height="512.0" layoutX="87.0" layoutY="32.0" onMouseDragged="#canvasMouseDragged" onMousePressed="#canvasMousePressed" onMouseReleased="#canvasMouseReleased" width="604.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-               <TextField fx:id="canvasTextInput" layoutX="212.0" layoutY="126.0" style="-fx-background-color: transparent; -fx-border-color: transparent;" visible="false" />
+               <TextField fx:id="canvasTextInput" disable="true" layoutX="212.0" layoutY="126.0" onAction="#handleCanvasTextCommit" style="-fx-background-color: transparent; -fx-border-color: transparent;" visible="false" />
             </children>
          </AnchorPane>
        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="514.0" prefWidth="188.0">
             <children>
                <ListView fx:id="userListView" layoutX="9.0" layoutY="38.0" prefHeight="180.0" prefWidth="164.0" />
-               <Label layoutX="14.0" layoutY="14.0" text="Users">
+               <Label layoutX="14.0" layoutY="14.0" text="Onine Users">
                   <font>
                      <Font size="14.0" />
                   </font>

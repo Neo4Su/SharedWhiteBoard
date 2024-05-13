@@ -63,9 +63,16 @@ public class CreateWhiteBoard extends Application {
 
     public static void main(String[] args) throws RemoteException {
         // connect to the server to get whiteboard service
-        username = args[0];
-        hostname = args[1];
-        port = Integer.parseInt(args[2]);
+        try {
+            username = args[0];
+            hostname = args[1];
+            port = Integer.parseInt(args[2]);
+        }catch (Exception e) {
+            System.err.println("Invalid parameters. " +
+                    "Usage: java -jar CreateWhiteBoard.jar <username> <hostname> <port>");
+            System.exit(0);
+        }
+
 
         connectServer();
 
@@ -80,7 +87,8 @@ public class CreateWhiteBoard extends Application {
             whiteBoardService = (WhiteBoardService) registry.lookup("whiteBoardService");
             System.out.println("Connected to server");
         } catch (RemoteException | NotBoundException e) {
-            e.printStackTrace();
+            System.err.println("Error: Cannot connect to whiteboard server.");
+            System.exit(0);
         }
     }
 

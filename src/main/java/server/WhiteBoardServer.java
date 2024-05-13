@@ -12,11 +12,17 @@ public class WhiteBoardServer {
         try {
             WhiteBoardService whiteBoardService = new WhiteBoardServiceImpl();
             int port = Integer.parseInt(args[0]);
+
+
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("whiteBoardService", whiteBoardService);
             System.out.println("Server is ready on port: " + port);
         } catch (RemoteException e) {
             e.printStackTrace();
+        }catch (Exception e){
+            System.err.println("Invalid parameter. " +
+                    "Usage: java -jar WhiteBoardServer.jar <port>");
+            System.exit(0);
         }
     }
 }
